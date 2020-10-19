@@ -28,26 +28,23 @@ namespace L7_1
                 if (figId == 0)
                 {
 
-                    figure = new Triangle<IFigure>(rand.Next(1, 10), rand.Next(1, 10));
+                    figure = new Triangle(rand.Next(1, 10), rand.Next(1, 10));
                 }
                 else if (figId == 1)
                 {
-                    figure = new Quad<IFigure>(rand.Next(1, 10));
+                    figure = new Quad(rand.Next(1, 10));
                 }
                 else
                 {
-                    figure = new Circle<IFigure>(rand.Next(1, 10));
+                    figure = new Circle(rand.Next(1, 10));
                 }
 
                 figures.Add(figure);
             }
 
-            figures.Sort(new FigureComparer<IFigure>());
+            figures.Sort(new FigureComparer());
 
-            foreach (var figure in figures)
-            {
-                Console.WriteLine(figure.ToString());
-            }
+            figures.ForEach((v) => Console.WriteLine(v));
 
             // Метод Sort по умолчанию работает только для наборов примитивных типов(int, string, double и др.), для остальных
             // нужно применять интерфейс IComparable

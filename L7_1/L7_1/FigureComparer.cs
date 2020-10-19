@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace L7_1
 {
-    public class FigureComparer<T> : IComparer<T> where T : IFigure
+    public class FigureComparer : IComparer<IFigure>
     {
-        public int Compare(T x, T y)
+        public int Compare(IFigure x, IFigure y)
         {
             if (x.Area < y.Area)
                 return 1;

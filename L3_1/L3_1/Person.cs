@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace L3_1
 {
-    public class Person
+    public class Person : BasePerson
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-
         public Person() { }
 
         public Person(string firstName, string lastName)
@@ -21,7 +18,18 @@ namespace L3_1
 
         public static explicit operator Person(string firstLastName)
         {
+            if (firstLastName == null)
+            {
+                throw new ArgumentNullException(nameof(firstLastName));
+            }
+
             string[] splitNames = firstLastName.Split(' ');
+
+            if (splitNames.Length != 2)
+            {
+                throw new IndexOutOfRangeException(nameof(firstLastName));
+            }
+
             return new Person(splitNames[0], splitNames[1]);
         }
 

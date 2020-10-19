@@ -22,7 +22,7 @@ namespace L3_1
             Console.WriteLine(nameof(person1) + " : " + person1.ToString());
 
             // Неявное перобразование
-            var person2 = person1;
+            BasePerson person2 = person1;
             Console.WriteLine(nameof(person2) + " : " + person2.ToString());
 
             // Явное перобразование из строки

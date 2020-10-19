@@ -12,11 +12,11 @@ namespace L17_1
     public class TaskQueue : IJobExecutor, IDisposable
     {
         private BlockingCollection<Action> _tasks;
-        private AutoResetEvent _eventWait;
-        private AutoResetEvent _eventWait1;
-        private List<Thread> _workers;
+        private AutoResetEvent _eventWaitTask;
+        private AutoResetEvent _eventWaitStartStop;
+        private Thread[] _workers;
         private bool _isStart;
-        public bool _isStop;
+        private bool _isStop;
         private int _timeOut;
 
         public int Amount
@@ -30,9 +30,8 @@ namespace L17_1
         public TaskQueue()
         {
             _tasks = new BlockingCollection<Action>();
-            _workers = new List<Thread>();
-            _eventWait = new AutoResetEvent(false);
-            _eventWait1 = new AutoResetEvent(true);
+            _eventWaitTask = new AutoResetEvent(false);
+            _eventWaitStartStop = new AutoResetEvent(true);
             _timeOut = 1000;
             _isStop = true;
         }
@@ -40,9 +39,8 @@ namespace L17_1
         public TaskQueue(int timeOut)
         {
             _tasks = new BlockingCollection<Action>();
-            _workers = new List<Thread>();
-            _eventWait = new AutoResetEvent(false);
-            _eventWait1 = new AutoResetEvent(true);
+            _eventWaitTask = new AutoResetEvent(false);
+            _eventWaitStartStop = new AutoResetEvent(true);
             _timeOut = timeOut;
             _isStop = true;
         }
@@ -51,7 +49,7 @@ namespace L17_1
         {
             if (maxConcurrent <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(maxConcurrent));
+                throw new ArgumentOutOfRangeException("maxConcurrent");
             }
 
             lock (_tasks)
@@ -61,32 +59,27 @@ namespace L17_1
                     return;
                 }
 
-                var threadStart = new Thread(() =>
+                _eventWaitStartStop.WaitOne();
+
+                _isStart = true;
+                _isStop = false;
+
+                _workers = new Thread[maxConcurrent];
+
+                for (int i = 0; i < maxConcurrent; i++)
                 {
-                    _eventWait1.WaitOne();
+                    _workers[i] = new Thread(ProcessingTask);
+                    _workers[i].Start();
+                }
 
-                    _isStart = true;
-                    _isStop = false;
-
-                    for (int i = 0; i < maxConcurrent; i++)
-                    {
-                        var worker = new Thread(ProcessingTask);
-                        _workers.Add(worker);
-                        worker.Start();
-                    }
-
-                    _eventWait1.Set();
-                });
-
-                threadStart.Start();
-                threadStart.Join();
+                _eventWaitStartStop.Set();
             }
         }
 
         public void Add(Action action)
         {
             _tasks.Add(action);
-            _eventWait.Set();
+            _eventWaitTask.Set();
         }
 
         public void Clear()
@@ -103,30 +96,22 @@ namespace L17_1
                     return;
                 }
 
-                var threadStop = new Thread(() =>
+                _eventWaitStartStop.WaitOne();
+
+                _isStop = true;
+                _isStart = false;
+
+                _eventWaitTask.Set();
+
+                foreach (var worker in _workers)
                 {
-                    _eventWait1.WaitOne();
-
-                    _isStop = true;
-                    _isStart = false;
-
-                    _eventWait.Set();
-
-                    foreach (var worker in _workers)
+                    if (!worker.Join(_timeOut))
                     {
-                        if (!worker.Join(_timeOut))
-                        {
-                            worker.Abort();
-                        }
+                        worker.Abort();
                     }
+                }
 
-                    _workers.Clear();
-
-                    _eventWait1.Set();
-                });
-
-                threadStop.Start();
-                threadStop.Join();
+                _eventWaitStartStop.Set();
             }
         }
 
@@ -134,20 +119,26 @@ namespace L17_1
         {
             while (true)
             {
-                _eventWait.WaitOne();
+                _eventWaitTask.WaitOne();
 
                 if (_isStop)
                 {
-                    _eventWait.Set();
+                    _eventWaitTask.Set();
                     break;
                 }
 
                 if (_tasks.Count > 0)
                 {
-                    _eventWait.Set();
-                    if (_tasks.TryTake(out var task))
+                    _eventWaitTask.Set();
+
+                    Action task = null;
+
+                    if (_tasks.TryTake(out task))
                     {
-                        task?.Invoke();
+                        if (task != null)
+                        {
+                            task.Invoke();
+                        }
                     }
                 }
             }
@@ -157,8 +148,8 @@ namespace L17_1
         {
             Stop();
             Clear();
-            _eventWait.Close();
-            _eventWait.Close();
+            _eventWaitTask.Close();
+            _eventWaitStartStop.Close();
             _tasks.Dispose();
             _workers = null;
         }

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace L7_1
+namespace L3_1
 {
-    public interface IFigure : IComparable<IFigure>
+    public class BasePerson
     {
-        double Area { get; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }

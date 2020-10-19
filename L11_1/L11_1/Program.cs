@@ -103,17 +103,13 @@ namespace L11_1
                     break;
                 }
 
-                dynamic result;
-
                 try
                 {
-                    result = int.Parse(input);
-                    person.Age = result;
+                    person.Age = int.Parse(input);
                 }
                 catch (FormatException)
                 {
-                    result = input;
-                    person.Name = result;
+                    person.Name = input;
                 }
             }
 
@@ -125,21 +121,16 @@ namespace L11_1
             var streamNumbers = new double[] { 10, 4, 100, 2, 5, 52, 24, 3, 78 };
             var percentDifferent = 100;
 
-            var analizer = new Analizer(streamNumbers, percentDifferent);
+            var analizer = new Analizer(streamNumbers[0], percentDifferent);
             var eventHandler = new PropertyChangedEventHandler(PropertyChangedAnalizer);
             analizer.PropertyChanged += eventHandler;
-            analizer.Start();
 
-            async void Wait()
+            foreach (var element in streamNumbers)
             {
-                while(!analizer.IsStop) 
-                {
-                    await Task.Delay(100);
-                }
-                analizer.PropertyChanged -= eventHandler;
+                analizer.Analize(element);
             }
-
-            Wait();
+           
+            analizer.PropertyChanged -= eventHandler;
 
             Console.ReadKey();
         }

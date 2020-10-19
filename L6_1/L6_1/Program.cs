@@ -36,58 +36,58 @@ namespace L6_1
 
             // Where
             Console.WriteLine("Элементы, где IsOk истина");
-            dynamic lst = someTypes.Where((v) => v.IsOk);
-            Print<IEnumerable>(lst);
+            IEnumerable resultLst = someTypes.Where((v) => v.IsOk);
+            Print(resultLst);
 
             Console.WriteLine();
 
             // Order By
             Console.WriteLine("Элементы, где длина Name равна 8 и сортировка по Name");
-            lst = someTypes.Where(v => v.Name.Length == 8).OrderBy(t => t.Name);
-            Print<IEnumerable>(lst);
+            resultLst = someTypes.Where(v => v.Name.Length == 8).OrderBy(t => t.Name);
+            Print(resultLst);
 
             Console.WriteLine();
 
             // Group By
             Console.WriteLine("Элементы сгруппированы по IsOk с подсчетом их кол-ва");
-            lst = someTypes.GroupBy(v => v.IsOk).Select(t => new { IsOk = t.Key, Count = t.Count() });
-            Print<IEnumerable>(lst);
+            resultLst = someTypes.GroupBy(v => v.IsOk).Select(t => new { IsOk = t.Key, Count = t.Count() });
+            Print(resultLst);
 
             Console.WriteLine();
 
             // Any
             Console.WriteLine("Проверка на наличие хотя бы одной даты больше заданной");
             DateTime date = new DateTime(2020, 1, 1);
-            dynamic result = someTypes.Any(v => v.Date > date);
-            Console.WriteLine(result);
+            var resultBool = someTypes.Any(v => v.Date > date);
+            Console.WriteLine(resultBool);
 
             Console.WriteLine();
 
             // All
             Console.WriteLine("Проверка, чтобы каждое имя было больше или равно 8");
-            result = someTypes.All(v => v.Name.Length >= 8);
-            Console.WriteLine(result);
+            resultBool = someTypes.All(v => v.Name.Length >= 8);
+            Console.WriteLine(resultBool);
 
             Console.WriteLine();
 
             // Sum
             Console.WriteLine("Сумма Index");
-            result = someTypes.Sum(v => v.Index);
-            Console.WriteLine("Сумма = " + result);
+            var resultInt = someTypes.Sum(v => v.Index);
+            Console.WriteLine(resultInt);
 
             Console.WriteLine();
 
             // Min
             Console.WriteLine("Минимальная дата");
-            result = someTypes.Select(v => v.Date).Min();
-            Console.WriteLine("Минимальная дата = " + result);
+            var resultDate = someTypes.Select(v => v.Date).Min();
+            Console.WriteLine(resultDate);
 
             Console.WriteLine();
 
             // Max
             Console.WriteLine("Максимальная дата");
-            result = someTypes.Select(v => v.Date).Max();
-            Console.WriteLine("Максимальная дата = " + result);
+            resultDate = someTypes.Select(v => v.Date).Max();
+            Console.WriteLine(resultDate);
         }
 
         private static void Print<T>(T elements) where T : IEnumerable

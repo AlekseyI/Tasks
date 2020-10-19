@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace L7_1
 {
-    public class Quad<T> : IFigure, IComparable<T> where T : IFigure
+    public class Quad : IFigure
     {
         public double A;
         public double Area
@@ -24,19 +24,19 @@ namespace L7_1
             A = a;
         }
 
-        public int CompareTo(T obj)
-        {
-            if (obj == null)
-            {
-                throw new ArgumentException(nameof(obj));
-            }
-
-            return Area.CompareTo(obj.Area);
-        }
-
         public override string ToString()
         {
-            return $"{nameof(Quad<T>)}: A = {A}, Area = {Area}";
+            return $"{nameof(Quad)}: A = {A}, Area = {Area}";
+        }
+
+        public int CompareTo(IFigure other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentException(nameof(other));
+            }
+
+            return Area.CompareTo(other.Area);
         }
     }
 }

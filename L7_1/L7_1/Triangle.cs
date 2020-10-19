@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace L7_1
 {
-    public class Triangle<T> : IFigure, IComparable<T> where T : IFigure
+    public class Triangle : IFigure
     {
         public double C;
         public double H;
@@ -26,20 +26,20 @@ namespace L7_1
             C = c;
             H = h;
         }
-       
-        public int CompareTo(T obj)
+
+        public int CompareTo(IFigure other)
         {
-            if (obj == null)
+            if (other == null)
             {
-                throw new ArgumentException(nameof(obj));
+                throw new ArgumentException(nameof(other));
             }
 
-            return Area.CompareTo(obj.Area);
+            return Area.CompareTo(other.Area);
         }
 
         public override string ToString()
         {
-            return $"{nameof(Triangle<T>)}: C = {C}, H = {H} Area = {Area}";
+            return $"{nameof(Triangle)}: C = {C}, H = {H} Area = {Area}";
         }
     }
 }

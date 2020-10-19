@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace L7_1
 {
-    public class Circle<T> : IFigure, IComparable<T> where T : IFigure
+    public class Circle : IFigure
     {
         public double R;
 
@@ -25,19 +25,19 @@ namespace L7_1
             }
         }
 
-        public int CompareTo(T obj)
+        public int CompareTo(IFigure other)
         {
-            if (obj == null)
+            if (other == null)
             {
-                throw new ArgumentException(nameof(obj));
+                throw new ArgumentException(nameof(other));
             }
 
-            return Area.CompareTo(obj.Area);
+            return Area.CompareTo(other.Area);
         }
 
         public override string ToString()
         {
-            return $"{nameof(Circle<T>)}: R = {R}, Area = {Area}";
+            return $"{nameof(Circle)}: R = {R}, Area = {Area}";
         }
     }
 }
