@@ -49,7 +49,7 @@ namespace L17_1
         {
             if (maxConcurrent <= 0)
             {
-                throw new ArgumentOutOfRangeException("maxConcurrent");
+                throw new ArgumentOutOfRangeException(nameof(maxConcurrent));
             }
 
             lock (_tasks)
@@ -131,14 +131,9 @@ namespace L17_1
                 {
                     _eventWaitTask.Set();
 
-                    Action task = null;
-
-                    if (_tasks.TryTake(out task))
+                    if (_tasks.TryTake(out var task))
                     {
-                        if (task != null)
-                        {
-                            task.Invoke();
-                        }
+                        task?.Invoke();
                     }
                 }
             }
