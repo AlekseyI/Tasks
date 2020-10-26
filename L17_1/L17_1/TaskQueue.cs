@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace L17_1
 {
@@ -13,12 +8,11 @@ namespace L17_1
     {
         private BlockingCollection<Action> _tasks;
         private AutoResetEvent _eventWaitTask;
-        private AutoResetEvent _eventWaitStartStop;
         private Thread[] _workers;
+        private CancellationTokenSource _sourceToken;
         private bool _isStart;
-        private bool _isStop;
         private int _timeOut;
-
+        
         public int Amount
         {
             get
@@ -31,18 +25,14 @@ namespace L17_1
         {
             _tasks = new BlockingCollection<Action>();
             _eventWaitTask = new AutoResetEvent(false);
-            _eventWaitStartStop = new AutoResetEvent(true);
             _timeOut = 1000;
-            _isStop = true;
         }
 
         public TaskQueue(int timeOut)
         {
             _tasks = new BlockingCollection<Action>();
             _eventWaitTask = new AutoResetEvent(false);
-            _eventWaitStartStop = new AutoResetEvent(true);
             _timeOut = timeOut;
-            _isStop = true;
         }
 
         public void Start(int maxConcurrent)
@@ -59,20 +49,18 @@ namespace L17_1
                     return;
                 }
 
-                _eventWaitStartStop.WaitOne();
-
                 _isStart = true;
-                _isStop = false;
+
+                _sourceToken?.Dispose();
+                _sourceToken = new CancellationTokenSource();
 
                 _workers = new Thread[maxConcurrent];
 
                 for (int i = 0; i < maxConcurrent; i++)
                 {
-                    _workers[i] = new Thread(ProcessingTask);
-                    _workers[i].Start();
+                    _workers[i] = new Thread(new ParameterizedThreadStart(ProcessingTask));
+                    _workers[i].Start(_sourceToken.Token);
                 }
-
-                _eventWaitStartStop.Set();
             }
         }
 
@@ -91,15 +79,13 @@ namespace L17_1
         {
             lock (_tasks)
             {
-                if (_isStop)
+                if (!_isStart)
                 {
                     return;
                 }
 
-                _eventWaitStartStop.WaitOne();
-
-                _isStop = true;
                 _isStart = false;
+                _sourceToken.Cancel();              
 
                 _eventWaitTask.Set();
 
@@ -110,18 +96,16 @@ namespace L17_1
                         worker.Abort();
                     }
                 }
-
-                _eventWaitStartStop.Set();
             }
         }
 
-        private void ProcessingTask()
+        private void ProcessingTask(object token)
         {
             while (true)
             {
                 _eventWaitTask.WaitOne();
 
-                if (_isStop)
+                if (((CancellationToken)token).IsCancellationRequested)
                 {
                     _eventWaitTask.Set();
                     break;
@@ -143,9 +127,9 @@ namespace L17_1
         {
             Stop();
             Clear();
-            _eventWaitTask.Close();
-            _eventWaitStartStop.Close();
-            _tasks.Dispose();
+            _eventWaitTask?.Close();
+            _tasks?.Dispose();
+            _sourceToken?.Dispose();
             _workers = null;
         }
     }

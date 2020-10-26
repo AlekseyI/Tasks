@@ -43,7 +43,6 @@ namespace L17_1
                 Console.WriteLine("Остановка очереди");
                 tasks.Stop();
                 Console.WriteLine("Задач в очереди = " + tasks.Amount);
-
             }
         }
 
