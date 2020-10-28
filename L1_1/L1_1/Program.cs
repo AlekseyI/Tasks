@@ -8,6 +8,7 @@ namespace L1_1
         static void Main(string[] args)
         {
             // Наследование, инкапсуляция, полиморфизм
+
             List<Tower> listTowers = new List<Tower>(3);
 
             RedGem redGem = new RedGem("Red Gem");

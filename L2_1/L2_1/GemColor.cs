@@ -24,6 +24,5 @@ namespace L2_1
         {
             return MemberwiseClone();
         }
-
     }
 }
