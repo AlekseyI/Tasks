@@ -5,9 +5,6 @@ namespace L1_1
 {
     public struct GemColor
     {
-        public const byte MinColorValue = 0;
-        public const byte MaxColorValue = 255;
-
         public byte Red { get; set; }
         public byte Green { get; set; }
         public byte Blue { get; set; }
@@ -47,9 +44,9 @@ namespace L1_1
         private static byte Add(byte a, byte b)
         {
             int c = a + b;
-            if (c > MaxColorValue)
+            if (c > byte.MaxValue)
             {
-                return MaxColorValue;
+                return byte.MaxValue;
             }
             return (byte)c;
         }
@@ -57,9 +54,9 @@ namespace L1_1
         private static byte Sub(byte a, byte b)
         {
             int c = a - b;
-            if (c < MinColorValue)
+            if (c < byte.MinValue)
             {
-                return MinColorValue;
+                return byte.MinValue;
             }
             return (byte)c;
         }
